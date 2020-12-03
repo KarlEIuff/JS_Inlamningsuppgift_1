@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="utf-8">
+		<title>MyCalc</title>
+		<style>
+			th, td {
+				text-align:center;
+				border: 3px solid black;
+				border-style: outset;
+				background-color: gray;
+				width: 20px;
+			}
+			td:hover {
+				background-color: yellow;
+			}
+			td:active {
+				background-color: gray;
+				filter: invert(1);
+			}
+		</style>
+		<script>
+			/* text entry stuff */
+			var entry = "";
+			var sgn = "";
+			function showEntry() {
+				var e = document.getElementById('entry');
+				e.innerHTML = sgn + entry + "_";
+			}
+      
+			/* stack stuff */
+			var stack = {X:0, Y:0, Z:0, T:0};
+
+			function showStack() {
+				var S = document.getElementById('stack');
+				S.innerHTML = "";
+				for(v in stack) {
+					S.innerHTML = v + ": " + stack[v].toPrecision(10) + "<br/>" + S.innerHTML;
+				}
+			}
+      
+			function push(newX) {
+				stack.T = stack.Z; 
+				stack.Z = stack.Y; 
+				stack.Y = stack.X; 
+				stack.X = newX;
+				showStack();
+			}
+			function concat(n) {
+				entry = entry + n;
+				showEntry();
+			}
+			function cle() {
+				entry = "";
+				showEntry();
+			}
+			function cls() {
+				stack.X = stack.Y = stack.Z = stack.T = 0;
+				showStack();
+			}
+			function enter() {
+				push(1*(sgn+entry));
+				entry = "";
+				sgn = "";
+				showEntry();
+			}
+			function chs() {
+				if(sgn == "") {
+					sgn = "-";
+				}
+				else if(sgn == "-") {
+					sgn = "+";
+				}
+				else if(sgn == "+") {
+					sgn = "-";
+				}
+				showEntry();
+			}
+			function divOp() {
+				stack.X = stack.Y/stack.X; 
+				stack.Y = stack.Z; 
+				stack.Z = stack.T;
+				showStack();
+			}
+			function mulOp() {
+				stack.X = stack.Y*stack.X; 
+				stack.Y = stack.Z; 
+				stack.Z = stack.T;
+				showStack();
+			}
+			function subOp() {
+				stack.X = stack.Y-stack.X; 
+				stack.Y = stack.Z; 
+				stack.Z = stack.T;
+				showStack();
+			}
+			function addOp() {
+				stack.X = stack.Y+stack.X; 
+				stack.Y = stack.Z; 
+				stack.Z = stack.T;
+				showStack();
+			}
+			function sqrtOp() {
+				stack.X = Math.sqrt(stack.X);
+				showStack();
+			}
+			function powOp() {
+				stack.X = Math.pow(stack.X, stack.Y);
+				stack.Y = stack.Z;
+				stack.Z = stack.T;
+				showStack();
+			}
+			function sinOp() {
+				stack.X = Math.sin(stack.X * Math.PI / 180);
+				showStack();
+			}
+			function cosOp() {
+				stack.X = Math.cos(stack.X * Math.PI / 180);
+				showStack();
+			}
+			function tanOp() {
+				stack.X = Math.sin(stack.X * Math.PI / 180) / Math.cos(stack.X * Math.PI / 180);
+				showStack();
+			}
+			function kp() {
+				var key = event.key
+				var debug = document.getElementById('debug');
+				debug.innerHTML = key;
+				
+				if(key == "1"){
+					concat("1");
+				} else if(key == "2"){
+					concat("2");
+				} else if(key == "3"){
+					concat("3");
+				} else if(key == "4"){
+					concat("4");
+				} else if(key == "5"){
+					concat("5");
+				} else if(key == "6"){
+					concat("6");
+				} else if(key == "7"){
+					concat("7");
+				} else if(key == "8"){
+					concat("8");
+				} else if(key == "9"){
+					concat("9");
+				} else if(key == "0"){
+					concat("0");
+				} else if(key == "Escape"){
+					cle();
+				} else if(key == "Backspace"){
+					cls();
+				} else if(key == "Enter"){
+					enter();
+				} else if(key == "/"){
+					divOp();
+				} else if(key == "*"){
+					mulOp();
+				} else if(key == "+"){
+					addOp();
+				} else if(key == "-"){
+					subOp();
+				}
+			}
+		</script>
+	</head>
+	<body onkeydown="kp()">
+		<h1>MyCalc</h1>
+		<table>
+			<tr>
+				<td colspan="4" style="background-color: white; text-align: left;" id="stack" ></td>
+				<script>showStack();</script>
+			</tr>
+			<tr>
+				<td colspan="4" style="border: none; background-color: white; text-align: left;" id="entry">_</td>
+			</tr>
+			<tr>
+				<td colspan="2" onclick="enter()">Enter</td>
+				<td onclick="cle()">ce</td>
+				<td onclick="cls()">cs</td>
+			</tr>
+			<tr>
+				<td onclick="concat('7')">7</td>
+				<td onclick="concat('8')">8</td>
+				<td onclick="concat('9')">9</td>
+				<td onclick="divOp()">/</td>
+				<td onclick="sqrtOp()">√</td>
+			</tr>
+			<tr>
+				<td onclick="concat('4')">4</td>
+				<td onclick="concat('5')">5</td>
+				<td onclick="concat('6')">6</td>
+				<td onclick="mulOp()">*</td>
+				<td onclick="powOp()">x^y</td>
+			</tr>
+			<tr>
+				<td onclick="concat('1')">1</td>
+				<td onclick="concat('2')">2</td>
+				<td onclick="concat('3')">3</td>
+				<td onclick="subOp()">-</td>
+				<td onclick="sinOp()">sin</td>
+			</tr>
+			<tr>
+				<td onclick="chs()">±</td>
+				<td onclick="concat('0')">0</td>
+				<td>.</td>
+				<td onclick="addOp()">+</td>
+				<td onclick="cosOp()">cos</td>
+				<td onclick="tanOp()">tan</td>
+			</tr>
+		</table>
+		<p id="debug">Don't worry, be happy!</p>
+	</body>
